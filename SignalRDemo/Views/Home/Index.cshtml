@@ -1,0 +1,54 @@
+﻿
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+
+    <script src="~/Scripts/jquery-3.4.1.js"></script>
+    <script src="~/Scripts/jquery.signalR-2.4.1.js"></script>
+    @*<script src="/signalr/hubs"></script>*@
+    <script src="@Url.Content("~/signalr/hubs")"></script>
+
+</head>
+<body>
+
+    <h1 id="titleName"></h1>
+    <br />
+
+    <input type="text" id="txtMessage" />
+    <br />
+    <br />
+    <button id="btnSend">Send Message</button>
+    <br /><hr />
+    <ul id="chatList">
+    </ul>
+
+</body>
+</html>
+
+<script>
+    $(document).ready(function () {
+
+        var name = prompt("Kullanıcı adınızı giriniz");
+        $("#titleName").html("Hoşgeldin " + name);
+
+        $.connection.hub.start();
+        var messageHub = $.connection.chatHub;
+
+        messageHub.client.getMessageCaller = function (message) {
+            $("#chatList").append("<li>" + message + "</li>");
+        };
+
+        messageHub.client.getMessageOther = function (name, message) {
+            $("#chatList").append("<li>" + name + ": " + message + "</li>");
+        };
+     
+        $("#btnSend").click(function () {
+            var message = $("#txtMessage").val();
+            messageHub.server.sendMessage(name, message);
+        })
+    });
+</script>
